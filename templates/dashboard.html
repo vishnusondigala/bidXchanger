@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | bidXchanger{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-wrapper {
+        display: flex;
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    @media (max-width: 900px) {
+        .dashboard-wrapper {
+            flex-direction: column;
+        }
+    }
+    .sidebar {
+        flex: 1;
+        min-width: 300px;
+        background: var(--surface);
+        border-radius: 16px;
+        padding: 2.5rem 2rem;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        height: fit-content;
+    }
+    .main-content {
+        flex: 3;
+    }
+    .profile-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        border-radius: 50%;
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        font-weight: 800;
+        color: #fff;
+        box-shadow: 0 8px 20px rgba(187, 134, 252, 0.3);
+    }
+    .stat-box {
+        background: var(--bg-color);
+        padding: 1.2rem;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid var(--border-color);
+        transition: transform 0.2s ease;
+    }
+    .stat-box:hover {
+        transform: translateY(-2px);
+    }
+    .stat-value {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: var(--primary);
+    }
+    .panel {
+        background: var(--surface);
+        padding: 2.5rem;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 2rem;
+    }
+    .panel-header {
+        margin-bottom: 2rem;
+        color: var(--text-main);
+        font-size: 1.5rem;
+        font-weight: 700;
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 1rem;
+    }
+    .custom-card {
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    .custom-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary);
+    }
+    .item-img-container {
+        width: 100%;
+        height: 220px;
+        background: var(--glass-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .item-img-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    .custom-card:hover .item-img-container img {
+        transform: scale(1.05);
+    }
+    .card-footer-actions {
+        display: flex;
+        gap: 0.8rem;
+        margin-top: 1.5rem;
+    }
+    .action-btn {
+        flex: 1;
+        text-align: center;
+        padding: 0.6rem 0;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    .btn-view {
+        background: var(--primary);
+        color: #fff !important;
+        border: none;
+    }
+    .btn-view:hover {
+        background: var(--primary-hover);
+        box-shadow: 0 4px 15px rgba(187, 134, 252, 0.4);
+    }
+    .btn-danger-outline {
+        border: 1px solid var(--danger);
+        color: var(--danger) !important;
+        background: transparent;
+    }
+    .btn-danger-outline:hover {
+        background: rgba(239, 68, 68, 0.1);
+    }
+    .btn-danger-solid {
+        background: var(--danger);
+        color: #fff !important;
+        border: none;
+    }
+    .btn-danger-solid:hover {
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+    .status-active { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    .status-sold { background: rgba(16, 185, 129, 0.1); color: var(--accent); }
+    .status-ended { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+    .status-cancelled { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+    .styled-table th {
+        padding: 1.2rem 1rem;
+        text-align: left;
+        color: var(--text-muted);
+        font-weight: 600;
+        border-bottom: 2px solid var(--border-color);
+    }
+    .styled-table td {
+        padding: 1.2rem 1rem;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-main);
+    }
+    .styled-table tr:hover {
+        background: rgba(0, 0, 0, 0.02);
+    }
+    .light-mode .styled-table tr:hover {
+        background: rgba(0, 0, 0, 0.02);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Profile Sidebar -->
+    <div class="sidebar">
+        <div class="profile-header">
+            <div class="profile-avatar">{{ user.username.0|upper }}</div>
+            <h2 style="margin-bottom: 0.5rem; color: var(--text-main);">{{ user.username }}</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">{{ user.email }}</p>
+            <div style="margin-top: 1.2rem; background: rgba(187, 134, 252, 0.1); color: var(--primary); padding: 0.4rem 1.2rem; border-radius: 20px; display: inline-block; font-weight: 600; font-size: 0.9rem; border: 1px solid rgba(187, 134, 252, 0.3);">
+                {{ role|title }} Profile
+            </div>
+        </div>
+        
+        <h4 style="margin-bottom: 1.2rem; margin-top: 1rem; color: var(--text-muted); font-size: 1.1rem;">Your Statistics</h4>
+        {% if role == 'seller' %}
+            <div class="stat-box">
+                <span style="color: var(--text-main);">Total Items</span>
+                <span class="stat-value">{{ total_items }}</span>
+            </div>
+            <div class="stat-box">
+                <span style="color: var(--text-main);">Active Auctions</span>
+                <span class="stat-value">{{ active_items }}</span>
+            </div>
+            <div class="stat-box">
+                <span style="color: var(--text-main);">Total Revenue</span>
+                <span class="stat-value" style="color: var(--accent);">₹{{ total_revenue }}</span>
+            </div>
+            <a href="{% url 'create_auction' %}" class="btn btn-primary" style="display: block; text-align: center; margin-top: 2.5rem; padding: 1rem; border-radius: 12px; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(187, 134, 252, 0.3);">+ Create New Auction</a>
+        {% elif role == 'buyer' %}
+            <div class="stat-box">
+                <span style="color: var(--text-main);">Total Bids Placed</span>
+                <span class="stat-value">{{ total_bids }}</span>
+            </div>
+            <div class="stat-box">
+                <span style="color: var(--text-main);">Auctions Won</span>
+                <span class="stat-value">{{ won_items|length }}</span>
+            </div>
+            <div class="stat-box">
+                <span style="color: var(--text-main);">Total Spent</span>
+                <span class="stat-value" style="color: var(--danger);">₹{{ total_spent }}</span>
+            </div>
+        {% else %}
+            <p style="color: var(--text-muted);">No statistics available for this role.</p>
+        {% endif %}
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        {% if role == 'seller' %}
+            <div class="panel">
+                <div class="panel-header">Your Listed Auctions</div>
+                {% if items %}
+                    <div class="grid">
+                        {% for item in items %}
+                        <div class="custom-card">
+                            <div class="item-img-container">
+                                {% if item.image %}
+                                    <img src="{{ item.image.url }}" alt="{{ item.title }}">
+                                {% else %}
+                                    <div style="color: var(--text-muted); font-size: 1.2rem;">No Image Available</div>
+                                {% endif %}
+                            </div>
+                            <div class="card-body" style="padding: 1.5rem;">
+                                <h3 style="color: var(--text-main); font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;">{{ item.title }}</h3>
+                                <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 0.5rem;">Current Bid: <strong style="color: var(--primary); font-size: 1.2rem;">₹{{ item.current_price }}</strong></p>
+                                
+                                {% if item.is_paid %}
+                                    <span class="status-badge status-sold">✓ Sold & Paid</span>
+                                {% else %}
+                                    {% if item.is_active and item.end_time > now %}
+                                        <span class="status-badge status-active">● Active</span>
+                                    {% elif not item.is_active %}
+                                        <span class="status-badge status-cancelled">✗ Cancelled</span>
+                                    {% else %}
+                                        <span class="status-badge status-ended">■ Ended</span>
+                                    {% endif %}
+                                {% endif %}
+                                
+                                <div class="card-footer-actions">
+                                    <a href="{% url 'auction_detail' item.id %}" class="action-btn btn-view">👁️ View Details</a>
+                                    
+                                    {% if item.is_active and item.end_time > now %}
+                                        <a href="{% url 'cancel_auction' item.id %}" class="action-btn btn-danger-outline" onclick="return confirm('Are you sure you want to cancel this auction?');">Cancel</a>
+                                    {% elif not item.is_active %}
+                                        <a href="{% url 'delete_auction' item.id %}" class="action-btn btn-danger-solid" onclick="return confirm('Permanently delete this cancelled auction? It will be removed from your dashboard and database forever.');">🗑 Destroy</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="text-align: center; padding: 4rem 2rem;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">📦</div>
+                        <h3 style="color: var(--text-main); margin-bottom: 0.5rem;">No Auctions Yet</h3>
+                        <p style="color: var(--text-muted);">You haven't listed any items for auction. Click the button on the left to start selling!</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+        {% elif role == 'buyer' %}
+            {% if won_items %}
+            <div class="panel" style="border: 2px solid var(--accent); position: relative; overflow: hidden;">
+                <div style="position: absolute; top: -15px; right: -15px; width: 60px; height: 60px; background: var(--accent); border-radius: 50%; display: flex; align-items: flex-end; justify-content: flex-start; padding: 10px; opacity: 0.2;">🏆</div>
+                <div class="panel-header" style="color: var(--accent); border-bottom-color: rgba(16, 185, 129, 0.2);">★ Auctions You Won!</div>
+                <div class="grid">
+                    {% for item in won_items %}
+                    <div class="custom-card" style="border-color: rgba(16, 185, 129, 0.3);">
+                        <div class="item-img-container">
+                            {% if item.image %}
+                                <img src="{{ item.image.url }}" alt="{{ item.title }}">
+                            {% endif %}
+                        </div>
+                        <div class="card-body" style="padding: 1.5rem;">
+                            <h3 style="color: var(--text-main); font-size: 1.3rem;">{{ item.title }}</h3>
+                            <p style="color: var(--text-muted); margin: 0.5rem 0;">Winning Amount: <strong style="color: var(--accent); font-size: 1.3rem;">₹{{ item.current_price }}</strong></p>
+                            
+                            {% if item.is_paid %}
+                                <div style="margin-top: 1.5rem; text-align: center; padding: 0.8rem; background: rgba(16, 185, 129, 0.1); color: var(--accent); border-radius: 8px; font-weight: 600;">✓ Payment Completed</div>
+                            {% else %}
+                                <a href="{% url 'checkout' item.id %}" class="btn btn-primary" style="display: block; width: 100%; text-align: center; margin-top: 1.5rem; background: var(--accent); color: white;">💳 Complete Payment Now</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="panel">
+                <div class="panel-header">Tracking Your Recent Bids</div>
+                {% if bids %}
+                    <div class="table-container">
+                        <table class="styled-table">
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Your Bid</th>
+                                <th>Placed On</th>
+                                <th style="text-align: center;">Action</th>
+                            </tr>
+                            {% for bid in bids|slice:":5" %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'auction_detail' bid.auction.id %}" style="color: var(--primary); font-weight: 600;">
+                                        {{ bid.auction.title }}
+                                        {% if not bid.auction.is_active %}<span class="status-badge status-cancelled" style="margin-left: 10px; font-size: 0.7rem; padding: 0.2rem 0.5rem;">Cancelled</span>{% endif %}
+                                    </a>
+                                </td>
+                                <td><strong style="color: var(--text-main);">₹{{ bid.amount }}</strong></td>
+                                <td style="color: var(--text-muted);">{{ bid.timestamp|date:"M d, Y" }}</td>
+                                <td style="text-align: center;">
+                                    {% if bid.auction.is_active and bid.auction.end_time > now %}
+                                    <a href="{% url 'withdraw_bid' bid.id %}" class="action-btn btn-danger-outline" style="display: inline-block; padding: 0.4rem 1rem; font-size: 0.9rem;" onclick="return confirm('Withdraw this bid?');">Withdraw</a>
+                                    {% else %}
+                                    <span style="color: var(--text-muted);">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                {% else %}
+                    <div style="text-align: center; padding: 3rem 2rem;">
+                        <p style="color: var(--text-muted); font-size: 1.1rem;">You haven't placed any bids yet. Explore the marketplace!</p>
+                        <a href="{% url 'home' %}" class="btn action-btn btn-view" style="display: inline-block; margin-top: 1rem; padding: 0.8rem 2rem;">Explore Auctions</a>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

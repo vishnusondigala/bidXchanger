@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Auction | bidXchanger{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 600px;">
+    <h2 style="margin-bottom: 2rem; font-size: 2rem; text-align: center;">List a New Item</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <small style="color: var(--danger);">{{ field.errors.0 }}</small>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; font-size: 1.1rem;">Launch Auction</button>
+    </form>
+</div>
+{% endblock %}

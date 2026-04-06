@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout | bidXchanger{% endblock %}
+
+{% block extra_css %}
+<style>
+    .checkout-container {
+        max-width: 600px;
+        margin: 3rem auto;
+        background: var(--surface);
+        border-radius: 20px;
+        padding: 3rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .checkout-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .checkout-header h2 {
+        font-size: 2rem;
+        color: #fff;
+    }
+    .amount-display {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(90deg, #10b981, #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 1rem 0;
+    }
+    .item-details {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: rgba(0,0,0,0.2);
+        border-radius: 10px;
+    }
+    .item-details p {
+        margin: 0.5rem 0;
+        color: #ccc;
+        display: flex;
+        justify-content: space-between;
+    }
+    .item-details strong {
+        color: #fff;
+    }
+    .btn-pay {
+        width: 100%;
+        padding: 1.2rem;
+        font-size: 1.2rem;
+        font-weight: bold;
+        background: linear-gradient(45deg, #10b981, #059669);
+        border: none;
+        border-radius: 10px;
+        color: #fff;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    .btn-pay:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="checkout-header">
+        <h2>Complete Payment</h2>
+        <p style="color: #aaa;">You won the auction! Complete your purchase safely.</p>
+        <div class="amount-display">₹{{ item.current_price }}</div>
+    </div>
+    
+    <div class="item-details">
+        <p>Item Title: <strong>{{ item.title }}</strong></p>
+        <p>Category: <strong>{{ item.category.name }}</strong></p>
+        <p>Seller: <strong>{{ item.seller.username }}</strong></p>
+        <p>Won Date: <strong>{{ item.end_time|date:"M d, Y" }}</strong></p>
+    </div>
+    
+    <form id="razorpay-form" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+        <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+        <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+        
+        <p style="text-align: center; color: #888; font-size: 0.9rem; margin-bottom: 1.5rem;">
+            * Secure payment powered by Razorpay.
+        </p>
+        <button type="button" class="btn-pay" id="rzp-button1">Pay ₹{{ item.current_price }}</button>
+    </form>
+    
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+    var options = {
+        "key": "{{ razorpay_key }}", 
+        "amount": "{{ amount_in_paise }}", 
+        "currency": "INR",
+        "name": "bidXchanger",
+        "description": "Payment for {{ item.title|escapejs }}",
+        "order_id": "{{ razorpay_order_id }}", 
+        "handler": function (response){
+            document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+            document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+            document.getElementById('razorpay_signature').value = response.razorpay_signature;
+            document.getElementById('razorpay-form').submit();
+        },
+        "prefill": {
+            "name": "{{ request.user.username|escapejs }}",
+            "email": "{{ request.user.email|escapejs }}",
+        },
+        "theme": {
+            "color": "#10b981"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    rzp1.on('payment.failed', function (response){
+            alert("Payment failed: " + response.error.description);
+    });
+    document.getElementById('rzp-button1').onclick = function(e){
+        rzp1.open();
+        e.preventDefault();
+    }
+    </script>
+</div>
+{% endblock %}

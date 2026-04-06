@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}E-Auction{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <script>
+        // Apply theme immediately to prevent flashing
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+        }
+    </script>
+    <nav class="navbar">
+        <div class="logo">bidXchanger</div>
+        <ul class="nav-links">
+            <li><button id="theme-toggle" class="btn btn-outline"
+                    style="padding: 0.4rem 0.8rem; border-radius: 50%; font-size: 1rem; border: none; background: rgba(187, 134, 252, 0.1);">🌓</button>
+            </li>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'about' %}">About</a></li>
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'logout' %}" class="btn btn-outline" style="padding: 0.4rem 1rem;">Logout</a></li>
+            {% else %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+            <li><a href="{% url 'register' %}" class="btn btn-primary" style="padding: 0.4rem 1rem;">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    {% block hero %}{% endblock %}
+
+    <div class="container">
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="rich-footer">
+        <div class="footer-content"
+            style="display: flex; flex-wrap: wrap; justify-content: space-between; max-width: 1200px; margin: 0 auto; gap: 2rem; padding: 3rem 5%; text-align: left;">
+            <div class="footer-section about" style="flex: 1; min-width: 250px;">
+                <h2 style="color: var(--primary); font-weight: 800; margin-bottom: 1rem;">bidXchanger</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">The premier online platform
+                    for exclusive auctions. We connect verified buyers and sellers in a secure, transparent, and premium
+                    environment.</p>
+            </div>
+            <div class="footer-section links" style="flex: 1; min-width: 200px;">
+                <h3 style="color: var(--text-main); margin-bottom: 1rem;">Quick Links</h3>
+                <ul style="list-style: none; padding: 0; line-height: 2;">
+                    <li><a href="{% url 'home' %}" style="color: var(--text-muted); text-decoration: none;">Home</a>
+                    </li>
+                    <li><a href="{% url 'about' %}" style="color: var(--text-muted); text-decoration: none;">About
+                            Us</a></li>
+                    <li><a href="#" style="color: var(--text-muted); text-decoration: none;">Privacy Policy</a></li>
+                    <li><a href="#" style="color: var(--text-muted); text-decoration: none;">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-section contact" style="flex: 1; min-width: 250px;">
+                <h3 style="color: var(--text-main); margin-bottom: 1rem;">Contact Us</h3>
+                <p style="color: var(--text-muted); margin-bottom: 0.5rem;">📧 support@bidxchanger.com </p>
+                <p style="color: var(--text-muted); margin-bottom: 0.5rem;">📞+91 6351282312</p>
+                <p style="color: var(--text-muted);">🏢 120, Shiv Complex, Opp. New Bus Stand, Ahmedabad, Gujarat, India
+                </p>
+            </div>
+        </div>
+        <div class="footer-bottom"
+            style="text-align: center; padding: 1.5rem; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.85rem; background: var(--bg-color-soft);">
+            &copy; 2026 bidXchanger. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+
+        // Update icon based on current theme
+        const updateIcon = () => {
+            if (document.body.classList.contains('light-mode')) {
+                themeToggleBtn.innerText = '🌙';
+            } else {
+                themeToggleBtn.innerText = '☀️';
+            }
+        };
+
+        updateIcon();
+
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            updateIcon();
+
+            if (document.body.classList.contains('light-mode')) {
+                localStorage.setItem('theme', 'light');
+            } else {
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+    </script>
+</body>
+
+</html>

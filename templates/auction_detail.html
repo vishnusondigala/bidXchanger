@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ item.title }} | bidXchanger{% endblock %}
+
+{% block content %}
+<a href="{% url 'home' %}" class="btn btn-outline" style="margin-bottom: 2rem;">&larr; Back to Auctions</a>
+
+<div class="detail-grid">
+    <div>
+        {% if item.image %}
+            <div style="background: rgba(0,0,0,0.4); border-radius: 12px; height: 400px; display: flex; align-items: center; justify-content: center; padding: 1rem;">
+                <img src="{{ item.image.url }}" alt="{{ item.title }}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px;">
+            </div>
+        {% else %}
+            <div class="detail-img" style="background: #2a2a35; height: 400px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 2rem; border-radius: 12px;">No Image Provided</div>
+        {% endif %}
+    </div>
+    
+    <div class="detail-info">
+        <h1>{{ item.title }}</h1>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">Seller: {{ item.seller.username }} | Category: {{ item.category.name|default:"Uncategorized" }}</p>
+        <p style="line-height: 1.8; margin-bottom: 2rem;">{{ item.description }}</p>
+        
+        <div class="card" style="padding: 2rem; background: rgba(187, 134, 252, 0.05); border-color: var(--primary);">
+            <div style="font-size: 1.2rem; color: var(--text-muted);">Current Highest Bid</div>
+            <div class="detail-price">₹{{ item.current_price }}</div>
+            <div style="margin-bottom: 1.5rem;">Ends on: <strong>{{ item.end_time|date:"M d, Y H:i" }}</strong></div>
+            
+            {% if item.end_time < now or not item.is_active %}
+                <div style="padding: 1.5rem; background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--danger); border-radius: 8px;">
+                    <h3 style="color: var(--danger); margin-bottom: 0.5rem;">Auction Ended</h3>
+                    {% if item.winner %}
+                        <p style="color: var(--text-main);">Winner: <strong>{{ item.winner.username }}</strong> with a bid of ₹{{ item.current_price }}</p>
+                        {% if request.user == item.winner %}
+                            {% if not item.is_paid %}
+                                <a href="{% url 'checkout' item.id %}" class="btn btn-primary" style="display: block; text-align: center; margin-top: 1rem; width: 100%;">💳 Proceed to Payment</a>
+                            {% else %}
+                                <p style="color: var(--accent); font-weight: bold; margin-top: 0.5rem; text-align: center;">✓ Payment Completed</p>
+                            {% endif %}
+                        {% endif %}
+                    {% else %}
+                        <p style="color: var(--text-muted);">This auction ended with no bids.</p>
+                    {% endif %}
+                </div>
+            {% else %}
+                {% if user.is_authenticated and user.is_buyer %}
+                    <form action="{% url 'place_bid' item.id %}" method="post" style="display: flex; gap: 1rem;">
+                        {% csrf_token %}
+                        <input type="number" name="amount" min="{{ item.current_price|add:'0.01' }}" step="0.01" class="form-group" style="flex: 1; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: white;" placeholder="Enter bid amount" required>
+                        <button type="submit" class="btn btn-primary">Place Bid</button>
+                    </form>
+                {% elif user.is_authenticated and not user.is_buyer %}
+                    <p style="color: var(--danger);">Only buyers can place bids.</p>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-outline">Log in to Bid</a>
+                {% endif %}
+            {% endif %}
+        </div>
+        
+        <div class="bid-history">
+            <h3>Bid History</h3>
+            {% if bids %}
+                <ul class="bid-list">
+                    {% for bid in bids %}
+                        <li style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <div>
+                                <span><strong style="color: {% if request.user == bid.bidder %}#bb66ff{% else %}#fff{% endif %};">{{ bid.bidder.username }}</strong></span>
+                                <span style="margin-left: 1rem; color: #10b981;">₹{{ bid.amount }}</span>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-muted); font-size: 0.85rem; margin-right: 1rem;">{{ bid.timestamp|date:"M d, H:i" }}</span>
+                                {% if request.user == bid.bidder and item.is_active %}<a href="{% url 'withdraw_bid' bid.id %}" style="color: #ef4444; font-size: 0.8rem; text-decoration: none; border: 1px solid #ef4444; padding: 2px 6px; border-radius: 4px;" onclick="return confirm('Withdraw this bid?');">Withdraw</a>{% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p style="color: var(--text-muted); margin-top: 1rem;">No bids placed yet. Be the first!</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

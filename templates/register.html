@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register | bidXchanger{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-image: url('{% static "images/auth_bg.png" %}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    .container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 150px);
+        padding: 2rem 0;
+    }
+    .form-container {
+        background: rgba(20, 20, 25, 0.7);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+        padding: 3rem;
+        border-radius: 20px;
+        max-width: 500px;
+        width: 100%;
+        color: #fff;
+    }
+    .form-container h2 {
+        background: linear-gradient(90deg, #bb66ff, #66b3ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+        font-size: 2.2rem;
+        margin-bottom: 0.5rem;
+    }
+    .form-group label {
+        color: #bbb;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+    .form-group input, .form-group select {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border-radius: 8px;
+        padding: 0.8rem;
+    }
+    .form-group input:focus, .form-group select:focus {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: #bb66ff;
+        outline: none;
+        box-shadow: 0 0 10px rgba(187, 102, 255, 0.3);
+    }
+    .btn-primary {
+        background: linear-gradient(45deg, #7c3aed, #2563eb);
+        border: none;
+        padding: 1rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(124, 58, 237, 0.4);
+    }
+    .helptext {
+        font-size: 0.8rem;
+        color: #888;
+        display: block;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h2>Create an Account</h2>
+        <p style="color: #aaa; font-size: 0.95rem;">Join the most premium e-auction platform.</p>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <span class="helptext">{{ field.help_text }}</span>
+                {% endif %}
+                {% if field.errors %}
+                    <small style="color: #ef4444; display: block; margin-top: 0.25rem;">{{ field.errors.0 }}</small>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">Register Now</button>
+    </form>
+    <p style="margin-top: 2rem; text-align: center; color: #9ca3af; font-size: 0.95rem;">
+        Already have an account? <a href="{% url 'login' %}" style="color: #a78bfa; font-weight: 600; text-decoration: none;">Log In</a>
+    </p>
+</div>
+{% endblock %}
